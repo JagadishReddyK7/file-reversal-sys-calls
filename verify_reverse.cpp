@@ -70,7 +70,7 @@ int main(int argc, char* argv[]) {
         content="No";
         same_size="No";
     }
-    else if(flag==1) {
+    if(flag==1) {
         off_t mod=st1.st_size%buf_size;
         cout << mod << endl;
         off_t idx1=0, idx2=st2.st_size-mod;
@@ -108,7 +108,7 @@ int main(int argc, char* argv[]) {
             idx2=st2.st_size-mod-idx1;
         }
         if(idx1<st1.st_size) content="No";
-        else content = "YES";
+        else content = "Yes";
     }
     else if(flag==0) {
         off_t idx1=0, idx2=0;
@@ -144,7 +144,7 @@ int main(int argc, char* argv[]) {
             }
         }
         if(idx1<st1.st_size) content="No";
-        else content = "YES";
+        else content = "Yes";
     }
     else if(flag==2) {
         off_t mod=start_idx%buf_size;

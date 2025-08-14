@@ -14,15 +14,14 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
     const char* input_file = argv[1];
-    cout << input_file << endl; 
+    cout << "Input file path=====> " << input_file << endl; 
     int flag = atoi(argv[2]);
-    cout << flag << endl;
-    cout << CHUNK_SIZE << endl;
+    cout << "chunk_size taken=====> " << CHUNK_SIZE << " bytes" << endl;
     off_t buf_size=CHUNK_SIZE;
     off_t block_size=CHUNK_SIZE;
     if(flag==0) {
         block_size = atoi(argv[3]);
-        cout << block_size << endl;
+        cout << "Block Size======> " << block_size << " bytes" << endl;
         if(CHUNK_SIZE<block_size) buf_size=block_size;
     }
     char buf[buf_size];
@@ -49,10 +48,10 @@ int main(int argc, char* argv[]) {
     const char* input_filename;
     const char* last_slash=strrchr(input_file,'/');
     input_filename=last_slash+1;
-    cout << input_filename << endl;
 
     char output_path[256];
     int out_length = snprintf(output_path, sizeof(output_path), "%s/%d_%s", dir_name, flag, input_filename);
+    cout << "Output file path====> " << output_path << endl;
 
     fd_read = open(input_file, O_RDONLY, 0644);
     if (fd_read < 0) {
@@ -79,7 +78,7 @@ int main(int argc, char* argv[]) {
         close(fd_write);
         return 1;
     }
-    cout << "Size of the file is: " << status.st_size << endl;
+    cout << "Size of the file is: " << status.st_size << " bytes" << endl;
 
     if(flag==0) {
         
@@ -116,7 +115,7 @@ int main(int argc, char* argv[]) {
                     exit(FAILURE);
                 }
             }
-            cout << endl << "Block-wise reversal of the given file is successful and was written to " << output_path << " with block size " << block_size << endl;
+            cout << endl << "SUCCESS: Block-wise reversal of the given file is successful and was written to " << output_path << " with block size " << block_size << endl;
         }
         else if(CHUNK_SIZE>=block_size) {
             idx=0;
@@ -126,9 +125,7 @@ int main(int argc, char* argv[]) {
                 if(CHUNK_SIZE>=status.st_size) bytes_to_read=status.st_size;
                 if(status.st_size-idx<block_size) {
                     bytes_to_read=status.st_size-idx;
-                    cout << bytes_to_read << endl;
                 }
-                cout << bytes_to_read << endl;
 
                 if (lseek(fd_read, idx, SEEK_SET) == -1) {
                     perror("lseek failed");
@@ -137,7 +134,6 @@ int main(int argc, char* argv[]) {
                     exit(FAILURE);
                 }
                 bytes_read = read(fd_read, buf, bytes_to_read);
-                cout<< buf[status.st_size-1] << endl;
                 if (bytes_read>0) {
                     for(off_t i=0;i<bytes_to_read;i+=block_size) {
                         off_t end=i+block_size;
@@ -167,7 +163,7 @@ int main(int argc, char* argv[]) {
                     exit(FAILURE);
                 }
             }
-            cout << endl << "Block-wise reversal of the given file is successful and was written to " << output_path << " with block size " << block_size << endl;
+            cout << endl << "SUCCESS: Block-wise reversal of the given file is successful and was written to " << output_path << " with block size " << block_size << endl;
         }
 
     }
@@ -189,15 +185,15 @@ int main(int argc, char* argv[]) {
                     buf[bytes_read-i-1]=temp;
                 }
                 bytes_write=write(fd_write, buf, bytes_read);
-                total_bytes_written+=bytes_write;
-                double progress = (static_cast<double>(total_bytes_written) / status.st_size) * 100.0;
-                cout << "\rProgress: " << fixed << setprecision(1) << progress << "%" << flush;
                 if(bytes_write<0) {
                     perror("write failed");
                     close(fd_read);
                     close(fd_write);
                     exit(FAILURE);
                 }
+                total_bytes_written+=bytes_write;
+                double progress = (static_cast<double>(total_bytes_written) / status.st_size) * 100.0;
+                cout << "\rProgress: " << fixed << setprecision(1) << progress << "%" << flush;
             } else if (bytes_read < 0) {
                 perror("read failed");
                 close(fd_read);
@@ -205,12 +201,11 @@ int main(int argc, char* argv[]) {
                 exit(FAILURE);
             }
         }
-        cout << endl << "Full file reversal of the given input file is successful and is written to " << output_path << endl;
+        cout << endl << "SUCCESS: Full file reversal of the given input file is successful and is written to " << output_path << endl;
     }
     else if(flag==2) {
         off_t start_idx=atoi(argv[3]);
         off_t end_idx=atoi(argv[4]);
-        cout << start_idx << endl << end_idx << endl;
         off_t mod=start_idx%CHUNK_SIZE;
         idx=start_idx-mod;
         for(; idx>=0;idx-=CHUNK_SIZE) {
@@ -229,15 +224,15 @@ int main(int argc, char* argv[]) {
                     buf[bytes_read-i-1]=temp;
                 }
                 bytes_write=write(fd_write, buf, bytes_read);
-                total_bytes_written+=bytes_write;
-                double progress = (static_cast<double>(total_bytes_written) / status.st_size) * 100.0;
-                cout << "\rProgress: " << fixed << setprecision(1) << progress << "%" << flush;
                 if(bytes_write<0) {
                     perror("write failed");
                     close(fd_read);
                     close(fd_write);
                     exit(FAILURE);
                 }
+                total_bytes_written+=bytes_write;
+                double progress = (static_cast<double>(total_bytes_written) / status.st_size) * 100.0;
+                cout << "\rProgress: " << fixed << setprecision(1) << progress << "%" << flush;
             } else if (bytes_read < 0) {
                 perror("read failed");
                 close(fd_read);
@@ -257,15 +252,15 @@ int main(int argc, char* argv[]) {
             else bytes_read = read(fd_read, buf, CHUNK_SIZE);
             if(bytes_read>0) {
                 bytes_write=write(fd_write, buf, bytes_read);
-                total_bytes_written+=bytes_write;
-                double progress = (static_cast<double>(total_bytes_written) / status.st_size) * 100.0;
-                cout << "\rProgress: " << fixed << setprecision(1) << progress << "%" << flush;
                 if(bytes_write<0) {
                     perror("write failed");
                     close(fd_read);
                     close(fd_write);
                     exit(FAILURE);
                 }
+                total_bytes_written+=bytes_write;
+                double progress = (static_cast<double>(total_bytes_written) / status.st_size) * 100.0;
+                cout << "\rProgress: " << fixed << setprecision(1) << progress << "%" << flush;
             } else if (bytes_read < 0) {
                 perror("read failed");
                 close(fd_read);
@@ -290,15 +285,15 @@ int main(int argc, char* argv[]) {
                     buf[bytes_read-i-1]=temp;
                 }
                 bytes_write=write(fd_write, buf, bytes_read);
-                total_bytes_written+=bytes_write;
-                double progress = (static_cast<double>(total_bytes_written) / status.st_size) * 100.0;
-                cout << "\rProgress: " << fixed << setprecision(1) << progress << "%" << flush;
                 if(bytes_write<0) {
                     perror("write failed");
                     close(fd_read);
                     close(fd_write);
                     exit(FAILURE);
                 }
+                total_bytes_written+=bytes_write;
+                double progress = (static_cast<double>(total_bytes_written) / status.st_size) * 100.0;
+                cout << "\rProgress: " << fixed << setprecision(1) << progress << "%" << flush;
             } else if (bytes_read < 0) {
                 perror("read failed");
                 close(fd_read);
@@ -306,7 +301,7 @@ int main(int argc, char* argv[]) {
                 exit(FAILURE);
             }
         }
-        cout << endl << "Partial range reversal of the given input file is successful and is written to " << output_path << " with range between " << start_idx << " and " << end_idx << endl;
+        cout << endl << "SUCCESS: Partial range reversal of the given input file is successful and is written to " << output_path << " with range between " << start_idx << " and " << end_idx << endl;
     }
     close(fd_read);
     close(fd_write);
