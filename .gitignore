@@ -1,2 +1,4 @@
 *.txt
 reverse
+string-gen.cpp
+reverse2
